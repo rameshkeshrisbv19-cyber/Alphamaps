@@ -21,7 +21,7 @@ export const NOIR_PALETTE: Palette = {
   water: '#05070a',
   waterway: '#05070a',
   building: '#6f6f6f',
-  buildingOutline: '#a3a3a3',
+  buildingOutline: '#8f8f8f',
   extrusion: '#666666',
   extrusionOpacity: 0.97,
   roadMajor: '#c4c4c4',
