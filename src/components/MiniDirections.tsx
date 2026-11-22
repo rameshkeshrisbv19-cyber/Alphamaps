@@ -50,35 +50,47 @@ export function MiniDirections({ query, result, fix, units, onExpand, onClose }:
       if (!next) next = steps[steps.length - 1];
       nextDistance = best === Infinity ? haversine(origin, next) : best;
     } else {
-      // No fix yet: show the first turn and the distance to it (the departure
-      // step carries the distance from the start to the first manoeuvre).
+      // No fix yet: show the first turn and the distance to it. For a route
+      // with no turns, use the total route distance to the destination.
       next = steps[1] ?? steps[0];
-      nextDistance = steps[1] ? steps[0].distance : next.distance;
+      if (steps[1]) {
+        nextDistance = next.icon === 'arrive' ? selected?.distance ?? steps[0].distance : steps[0].distance;
+      } else {
+        nextDistance = next.distance;
+      }
     }
   }
 
-  const arrived = !!next && (next.icon === 'arrive' || (fix !== null && nextDistance < 20));
-  const instruction = arrived
+  const atDestination = !!next && next.icon === 'arrive' && fix !== null && nextDistance < 30;
+  const headingToDestination = !!next && next.icon === 'arrive' && !atDestination;
+
+  const instruction = atDestination
     ? 'You have arrived'
     : result.status === 'loading'
       ? 'Finding your route…'
       : result.status === 'error'
         ? 'Route unavailable'
-        : next
-          ? next.text || FALLBACK_TEXT[next.icon] || 'Continue'
-          : 'Follow the highlighted route';
+        : headingToDestination
+          ? 'Continue to your destination'
+          : next
+            ? next.text || FALLBACK_TEXT[next.icon] || 'Continue'
+            : 'Follow the highlighted route';
 
-  const detail = arrived
+  const detail = atDestination
     ? 'You have reached your destination'
-    : result.status === 'error'
-      ? result.error ?? 'Please try again.'
-      : next?.street
-        ? next.street
-        : selected
-          ? `${mode.label} route · ${selected.turns} turn${selected.turns === 1 ? '' : 's'}`
-          : 'Calculating directions…';
+    : headingToDestination
+      ? query.end.name
+        ? `Destination: ${query.end.name}`
+        : 'Follow the highlighted route'
+      : result.status === 'error'
+        ? result.error ?? 'Please try again.'
+        : next?.street
+          ? next.street
+          : selected
+            ? `${mode.label} route · ${selected.turns} turn${selected.turns === 1 ? '' : 's'}`
+            : 'Calculating directions…';
 
-  const distanceText = arrived
+  const distanceText = atDestination
     ? 'Arrived'
     : result.status === 'loading'
       ? 'Calculating…'
@@ -87,7 +99,7 @@ export function MiniDirections({ query, result, fix, units, onExpand, onClose }:
           ? 'Now'
           : `in ${formatDistance(nextDistance, units)}`
         : next
-          ? formatDistance(next.distance, units)
+          ? formatDistance(nextDistance, units)
           : '—';
 
   const speed = formatSpeed(fix?.speed, units);
