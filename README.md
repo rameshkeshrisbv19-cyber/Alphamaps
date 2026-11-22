@@ -158,6 +158,7 @@ After one visit while online, the app shell and the map areas you viewed are cac
 
 ```
 index.html                  title, PWA meta and links, branded instant boot splash
+vercel.json                 Vercel build/output settings and service-worker headers
 public/
   manifest.json             installable web-app manifest
   sw.js                     service worker: offline app shell + map tile cache
@@ -185,7 +186,7 @@ src/
     geo.ts                  Haversine, unit formatting, accuracy circle, globe zoom
     http.ts                 fetch with timeout, offline and rate-limit errors; throttle; cache
     storage.ts              saved preferences (theme, language, units)
-  components/               search, settings chips, map buttons, bottom sheet, panels, toast, credits
+  components/               search, settings chips, map buttons, bottom sheet, panels, minimised directions, toast, credits
 ```
 
 **Changing colours or adding a theme.** Each theme is a *palette* object in `src/map/styles/*.ts`. Edit a colour there and the map and chrome update together. To add a theme, copy one palette file, register it in `src/map/styles/index.ts` (and `THEME_OPTIONS` in the same file), and add its UI tokens in `src/index.css`.
