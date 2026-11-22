@@ -10,12 +10,21 @@
  *    rate-limited and the app already caches results in memory.
  */
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = `alpha-map-shell-${VERSION}`;
 const TILE_CACHE = `alpha-map-tiles-${VERSION}`;
 const MAX_TILES = 2000;
 const TILE_HOSTS = ['tiles.openfreemap.org', 'api.maptiler.com'];
-const SHELL_FILES = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
+const SHELL_FILES = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/app-logo-512.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

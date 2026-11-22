@@ -4,7 +4,7 @@ A responsive, installable, offline-capable map built with **React + Vite + TypeS
 
 ## Features
 
-- **Fast start.** A branded, animated boot screen disappears on the first complete frame (not when every tile has finished). The map is tuned for mobile: capped device-pixel ratio, no tile cross-fade, no expired-tile refresh, parallel tile workers on multi-core devices, a bounded tile cache and a stale-while-revalidate service worker.
+- **Fast start.** A branded, animated boot screen using the supplied Alpha Maps artwork disappears on the first complete frame (not when every tile has finished). The map is tuned for mobile: capped device-pixel ratio, no tile cross-fade, no expired-tile refresh, parallel tile workers on multi-core devices, a bounded tile cache and a stale-while-revalidate service worker.
 - **Globe on start.** The whole Earth is shown, sized to the screen, with country, continent, ocean and sea names. Zoom in for cities, streets, points of interest and buildings.
 - **Three themes**, switched with the theme button and remembered between visits:
   - **Noir:** black land, `#05070a` water, light-grey roads (`#b5b5b5` major, `#8a8a8a` minor), dark-grey buildings (`#2a2a2a`) with a faint light outline, silver labels, no coloured land use and no POI icons. Public route numbers are warm amber.
