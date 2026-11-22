@@ -15,7 +15,7 @@ A responsive, installable, offline-capable map built with **React + Vite + TypeS
   - Roads are drawn from `transportation_name` with the exact OSM road name.
   - Motorways, trunks and primary routes also show the **public route number** from the OSM `ref` tag (I‑5, US 101, M1, A14 …), in a distinct shield-like colour.
   - Tapping a road shows its exact name and, when signposted, the route number; turn-by-turn steps show both too.
-- **Boundaries and buildings.** Country outlines have a dark casing and a clear mid-grey line at every zoom; state lines are dashed grey. Buildings are visible from zoom 13 in a light grey that stays dimmer than the roads, with a subtle outline and darker 3D extrusions.
+- **Boundaries and buildings.** Country outlines — including coastal and island outlines such as India and Sri Lanka — have a dark casing and a near-white line at every zoom; state lines are dashed grey. Buildings are visible from zoom 13 in a light grey that stays dimmer than the roads, with a subtle outline and height-lit 3D extrusions from zoom 14.5.
 - **Minimisable turn-by-turn.** The corner button in Directions minimises the sheet to a small floating window showing the next manoeuvre, distance to it, travel mode and live GPS speed. Expand it again or close it from the mini window.
 - **Live speed.** The mini directions window shows speed from the device GPS (km/h or mph) alongside Car, Bike or Walk mode.
 - **3D buildings.** Flat buildings from zoom 13, extruded 3D buildings from zoom 15. The **3D** button tilts the camera.

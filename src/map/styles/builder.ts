@@ -158,26 +158,31 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     paint: { 'line-color': p.waterway, 'line-width': ze(8, 0.4, 14, 2, 18, 6) },
   });
 
-  /* ---------- flat buildings (z13–15) with a light grey outline ---------- */
+  /* ---------- flat buildings (z13–14.5) with a light grey outline ---------- */
   L.push({
     id: 'building',
     type: 'fill',
     ...src,
     'source-layer': 'building',
     minzoom: 13,
-    maxzoom: 15,
-    paint: { 'fill-color': p.building, 'fill-opacity': zl(13, 0, 13.6, 1) },
+    maxzoom: 14.5,
+    paint: {
+      'fill-color': p.building,
+      'fill-opacity': zl(13, 0.2, 13.4, 1),
+      'fill-antialias': true,
+    },
   });
   L.push({
     id: 'building-outline',
     type: 'line',
     ...src,
     'source-layer': 'building',
-    minzoom: 13.2,
+    minzoom: 13,
+    maxzoom: 14.5,
     paint: {
       'line-color': p.buildingOutline,
-      'line-width': zl(13.2, 0.3, 17, 1),
-      'line-opacity': zl(13.2, 0, 13.8, 0.85),
+      'line-width': zl(13, 0.4, 17, 1.1),
+      'line-opacity': zl(13, 0.35, 13.4, 0.95),
     },
   });
 
@@ -231,19 +236,33 @@ export function buildLayers(p: Palette, lang: string): Json[] {
   road('road-major', MAJOR, p.roadMajor, [7, 0.5, 9, 1, 11, 1.8, 13, 3.4, 15, 7, 17, 14]);
   road('road-minor', MINOR, p.roadMinor, [11, 0.4, 13, 1.2, 15, 3.2, 17, 8]);
 
-  /* ---------- 3D buildings (z15+) ---------- */
+  /* ---------- 3D buildings (z14.5+) ----------
+     Height-based shading gives taller buildings a lighter, "lit" face while
+     keeping low homes a flat grey. */
   L.push({
     id: 'building-3d',
     type: 'fill-extrusion',
     ...src,
     'source-layer': 'building',
-    minzoom: 15,
+    minzoom: 14.5,
     filter: ['!=', ['get', 'hide_3d'], true],
     paint: {
-      'fill-extrusion-color': p.extrusion,
+      'fill-extrusion-color': [
+        'interpolate',
+        ['linear'],
+        ['coalesce', ['get', 'render_height'], 9],
+        0,
+        p.extrusion,
+        15,
+        p.building,
+        40,
+        p.buildingOutline,
+        100,
+        p.buildingOutline,
+      ],
       'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 9],
       'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-      'fill-extrusion-opacity': zl(15, 0, 15.6, p.extrusionOpacity),
+      'fill-extrusion-opacity': zl(14.5, 0, 15.1, p.extrusionOpacity),
       'fill-extrusion-vertical-gradient': true,
     },
   });
@@ -274,12 +293,12 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     ...src,
     'source-layer': 'boundary',
     minzoom: 0,
-    filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+    filter: ['==', ['get', 'admin_level'], 2],
     layout: boundaryLayout,
     paint: {
       'line-color': p.roadCasing ?? p.labelHalo,
       'line-width': ze(0, 1.6, 4, 2.6, 8, 3.6, 12, 4.4),
-      'line-opacity': 0.85,
+      'line-opacity': 0.9,
     },
   });
   L.push({
@@ -288,11 +307,11 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     ...src,
     'source-layer': 'boundary',
     minzoom: 0,
-    filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+    filter: ['==', ['get', 'admin_level'], 2],
     layout: boundaryLayout,
     paint: {
       'line-color': p.boundaryCountry,
-      'line-width': ze(0, 1, 4, 1.6, 8, 2.6, 12, 3.4),
+      'line-width': ze(0, 1.1, 4, 1.7, 8, 2.7, 12, 3.5),
       'line-opacity': 1,
     },
   });

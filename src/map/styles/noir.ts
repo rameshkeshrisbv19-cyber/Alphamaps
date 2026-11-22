@@ -1,12 +1,14 @@
 /**
- * Noir theme — the default. Pure black land, near-black water, light-grey roads
- * (#c4c4c4 major / #9a9a9a minor), clearly visible grey buildings (#6f6f6f)
- * with a light outline and dark-grey 3D extrusions. Country outlines are
- * mid-grey and state lines are dashed grey. Silver labels and no coloured
- * land use or POI icons.
+ * Noir theme — the default. A dark grey land base (#0e0e0e) with near-black water
+ * (#05070a) so the whole country remains visible even between mapped landcover
+ * polygons. Light-grey roads (#c4c4c4 major / #9a9a9a minor), clearly visible
+ * grey buildings (#8a8a8a) with a light outline, and 3D extrusions that get
+ * lighter with height. Country outlines are near-white (#e0e0e0) with a dark
+ * casing; state lines are dashed grey. Silver labels and no coloured land use
+ * or POI icons.
  *
  * "Noir" is deliberately monochrome: black, silver and a single warm route
- * highlight. Buildings extrude in 3D from zoom 15.
+ * highlight. Buildings appear from zoom 13 and extrude in 3D from zoom 14.5.
  */
 import type { StyleSpecification } from 'maplibre-gl';
 import { buildStyle, type Palette } from './builder';
@@ -14,23 +16,23 @@ import { buildStyle, type Palette } from './builder';
 export const NOIR_PALETTE: Palette = {
   id: 'noir',
   name: 'Noir',
-  background: '#000000',
-  landcover: '#0a0a0a',
-  landuse: '#0b0b0b',
-  park: '#0e0e0e',
+  background: '#0e0e0e',
+  landcover: '#101010',
+  landuse: '#111111',
+  park: '#151515',
   water: '#05070a',
   waterway: '#05070a',
-  building: '#6f6f6f',
-  buildingOutline: '#8f8f8f',
-  extrusion: '#666666',
-  extrusionOpacity: 0.97,
+  building: '#8a8a8a',
+  buildingOutline: '#a0a0a0',
+  extrusion: '#7a7a7a',
+  extrusionOpacity: 0.98,
   roadMajor: '#c4c4c4',
   roadMinor: '#9a9a9a',
   roadPath: '#5f5f5f',
   roadCasing: null,
   rail: '#6a6a6a',
-  boundaryCountry: '#8f8f8f',
-  boundaryState: '#5a5a5a',
+  boundaryCountry: '#e0e0e0',
+  boundaryState: '#9a9a9a',
   label: '#e0e0e0',
   labelMinor: '#b0b0b0',
   labelHalo: '#000000',
