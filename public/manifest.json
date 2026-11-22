@@ -1,0 +1,35 @@
+{
+  "name": "Alpha Maps: Globe, Places & Routes",
+  "short_name": "Alpha Maps",
+  "description": "A fast Alpha Maps world map with a full globe, precise place and street names, public route numbers, routes, distances and live location. Works offline once loaded.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["navigation", "travel", "maps"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

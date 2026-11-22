@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en" data-theme="noir">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070b" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="Alpha Maps — a fast, installable world map with a full globe, precise place and street names, route numbers, directions, distances and offline support."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Alpha Maps" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- Start connecting to the map and service hosts while the app boots -->
+    <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin />
+    <link rel="dns-prefetch" href="https://photon.komoot.io" />
+    <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org" />
+    <link rel="dns-prefetch" href="https://router.project-osrm.org" />
+    <title>Alpha Maps — Globe, Places &amp; Routes</title>
+
+    <!-- Instant boot splash (pure CSS, shown before any JavaScript runs) -->
+    <style>
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #05070b;
+        transition: opacity 0.45s ease;
+        opacity: 1;
+      }
+      #boot.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Ambient colour: a cold cyan glow and a faint warm counter-light. */
+      #boot::before {
+        content: "";
+        position: absolute;
+        inset: -30%;
+        background:
+          radial-gradient(38% 42% at 50% 42%, rgba(56, 189, 248, 0.16), transparent 70%),
+          radial-gradient(30% 30% at 78% 82%, rgba(244, 201, 93, 0.08), transparent 72%),
+          radial-gradient(26% 26% at 18% 16%, rgba(96, 165, 250, 0.1), transparent 72%);
+        animation: boot-breathe 5s ease-in-out infinite alternate;
+      }
+
+      /* A slow map-like grid, masked to the centre. */
+      #boot .boot-grid {
+        position: absolute;
+        inset: -20%;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        background-size: 56px 56px;
+        -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 0%, transparent 62%);
+        mask-image: radial-gradient(circle at 50% 46%, #000 0%, transparent 62%);
+        animation: boot-drift 22s linear infinite;
+        opacity: 0.7;
+      }
+
+      .boot-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+      }
+
+      .boot-mark {
+        width: 92px;
+        height: 92px;
+        filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.28));
+        animation: boot-float 4.5s ease-in-out infinite;
+      }
+
+      .boot-mark svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .boot-mark .a-stroke {
+        stroke-dasharray: 210;
+        stroke-dashoffset: 210;
+        animation: boot-draw 1.15s 0.08s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+      }
+
+      .boot-mark .a-dot {
+        opacity: 0;
+        animation: boot-pop 0.5s 0.95s ease forwards;
+        transform-origin: 48px 25px;
+      }
+
+      .boot-wordmark {
+        margin-top: 22px;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5em;
+        color: #f5f7fa;
+        font: 800 27px/1 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+        letter-spacing: 0.34em;
+        text-indent: 0.34em;
+      }
+
+      .boot-wordmark b {
+        color: #7dd3fc;
+        font-weight: 800;
+      }
+
+      .boot-tag {
+        margin-top: 11px;
+        color: #7b8794;
+        font: 600 10px/1 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+        letter-spacing: 0.34em;
+        text-indent: 0.34em;
+        text-transform: uppercase;
+      }
+
+      .boot-track {
+        position: relative;
+        width: 184px;
+        height: 3px;
+        margin-top: 34px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+      }
+
+      .boot-track::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 44%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8, #818cf8 55%, #f4c95d);
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+        animation: boot-slide 1.25s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+
+      .boot-status {
+        margin-top: 14px;
+        color: #5f6b7a;
+        font: 600 11px/1 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .boot-status::after {
+        content: "";
+        display: inline-block;
+        width: 1.2em;
+        text-align: left;
+        animation: boot-dots 1.4s steps(4, end) infinite;
+      }
+
+      @keyframes boot-slide {
+        0% { transform: translateX(-120%); }
+        100% { transform: translateX(340%); }
+      }
+      @keyframes boot-draw {
+        to { stroke-dashoffset: 0; }
+      }
+      @keyframes boot-pop {
+        0% { opacity: 0; transform: scale(0.4); }
+        70% { opacity: 1; transform: scale(1.18); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes boot-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+      }
+      @keyframes boot-breathe {
+        from { opacity: 0.72; transform: scale(1); }
+        to { opacity: 1; transform: scale(1.06); }
+      }
+      @keyframes boot-drift {
+        from { transform: translate3d(0, 0, 0); }
+        to { transform: translate3d(56px, 56px, 0); }
+      }
+      @keyframes boot-dots {
+        0% { content: ""; }
+        25% { content: "."; }
+        50% { content: ".."; }
+        75%, 100% { content: "..."; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #boot::before,
+        #boot .boot-grid,
+        .boot-mark,
+        .boot-track::after,
+        .boot-status::after {
+          animation: none;
+        }
+        .boot-mark .a-stroke { stroke-dashoffset: 0; }
+        .boot-mark .a-dot { opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot" aria-hidden="true">
+      <div class="boot-grid"></div>
+      <div class="boot-inner">
+        <div class="boot-mark">
+          <svg viewBox="0 0 96 96" role="presentation">
+            <defs>
+              <linearGradient id="alpha-a" x1="22" y1="74" x2="74" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#38bdf8" />
+                <stop offset="0.55" stop-color="#818cf8" />
+                <stop offset="1" stop-color="#f4c95d" />
+              </linearGradient>
+              <linearGradient id="alpha-ring" x1="8" y1="8" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="rgba(125,211,252,0.55)" />
+                <stop offset="0.5" stop-color="rgba(255,255,255,0.10)" />
+                <stop offset="1" stop-color="rgba(244,201,93,0.32)" />
+              </linearGradient>
+            </defs>
+            <rect x="5" y="5" width="86" height="86" rx="24" fill="rgba(255,255,255,0.025)" stroke="url(#alpha-ring)" stroke-width="1.5" />
+            <path
+              class="a-stroke"
+              d="M26 70 L48 24 L70 70"
+              fill="none"
+              stroke="url(#alpha-a)"
+              stroke-width="7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              class="a-stroke"
+              d="M36 55 L60 55"
+              fill="none"
+              stroke="url(#alpha-a)"
+              stroke-width="7"
+              stroke-linecap="round"
+            />
+            <circle class="a-dot" cx="48" cy="25" r="4.5" fill="#f8fbff" />
+            <circle class="a-dot" cx="48" cy="25" r="8.5" fill="none" stroke="rgba(125,211,252,0.45)" stroke-width="1.5" />
+          </svg>
+        </div>
+        <div class="boot-wordmark">ALPHA<b>MAPS</b></div>
+        <div class="boot-tag">Globe · Places · Routes</div>
+        <div class="boot-track"></div>
+        <div class="boot-status">Preparing your map</div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
