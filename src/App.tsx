@@ -17,6 +17,7 @@ import { MapButtons } from './components/MapButtons';
 import { Sheet } from './components/Sheet';
 import { PlacePanel } from './components/PlacePanel';
 import { DirectionsPanel } from './components/DirectionsPanel';
+import { MiniDirections } from './components/MiniDirections';
 import { DistancePanel } from './components/DistancePanel';
 import { Attribution } from './components/Attribution';
 import { ToastView } from './components/Feedback';
@@ -138,6 +139,7 @@ export default function App() {
   const [points, setPoints] = useState<DistancePoint[]>([]);
   const [road, setRoad] = useState<RoadState>(IDLE_ROAD);
   const [stepFocus, setStepFocus] = useState<LatLng | null>(null);
+  const [directionsMinimized, setDirectionsMinimized] = useState(false);
 
   /* ---------- feedback ---------- */
   const [toast, setToast] = useState<Toast | null>(null);
@@ -302,6 +304,7 @@ export default function App() {
     });
     setPicking(false);
     setPanel('directions');
+    setDirectionsMinimized(false);
     if (!fix) startLocation();
   };
 
@@ -311,6 +314,7 @@ export default function App() {
     setResult(IDLE_ROUTES);
     setPicking(false);
     setStepFocus(null);
+    setDirectionsMinimized(false);
   };
 
   const focusStep = (step: RouteStep) => {
@@ -574,8 +578,14 @@ export default function App() {
         </Sheet>
       )}
 
-      {panel === 'directions' && query && (
-        <Sheet title="Directions" subtitle={`To ${query.end.name}`} onClose={closeDirections}>
+      {panel === 'directions' && query && !directionsMinimized && (
+        <Sheet
+          title="Directions"
+          subtitle={`To ${query.end.name}`}
+          onClose={closeDirections}
+          onMinimize={() => setDirectionsMinimized(true)}
+          minimizeLabel="Minimize directions"
+        >
           <DirectionsPanel
             query={query}
             result={result}
@@ -583,6 +593,7 @@ export default function App() {
             picking={picking}
             geoStatus={geo.status}
             geoMessage={geo.message}
+            fix={geo.fix}
             onMode={(mode: TravelMode) => setQuery((q) => (q ? { ...q, mode } : q))}
             onSelect={selectRoute}
             onStep={focusStep}
@@ -595,6 +606,17 @@ export default function App() {
             onRetry={() => setQuery((q) => (q ? { ...q } : q))}
           />
         </Sheet>
+      )}
+
+      {panel === 'directions' && query && directionsMinimized && (
+        <MiniDirections
+          query={query}
+          result={result}
+          fix={geo.fix}
+          units={units}
+          onExpand={() => setDirectionsMinimized(false)}
+          onClose={closeDirections}
+        />
       )}
 
       {panel === 'distance' && (

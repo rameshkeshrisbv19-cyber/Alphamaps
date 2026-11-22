@@ -145,7 +145,7 @@ export function buildLayers(p: Palette, lang: string): Json[] {
 
   /* ---------- ground ---------- */
   L.push({ id: 'background', type: 'background', paint: { 'background-color': p.background } });
-  L.push({ id: 'landcover', type: 'fill', ...src, 'source-layer': 'landcover', minzoom: 2, paint: { 'fill-color': p.landcover } });
+  L.push({ id: 'landcover', type: 'fill', ...src, 'source-layer': 'landcover', minzoom: 0, paint: { 'fill-color': p.landcover } });
   L.push({ id: 'landuse', type: 'fill', ...src, 'source-layer': 'landuse', minzoom: 5, paint: { 'fill-color': p.landuse } });
   L.push({ id: 'park', type: 'fill', ...src, 'source-layer': 'park', minzoom: 3, paint: { 'fill-color': p.park } });
   L.push({ id: 'water', type: 'fill', ...src, 'source-layer': 'water', paint: { 'fill-color': p.water } });
@@ -158,7 +158,7 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     paint: { 'line-color': p.waterway, 'line-width': ze(8, 0.4, 14, 2, 18, 6) },
   });
 
-  /* ---------- flat buildings (z13–15) with a faint light outline ---------- */
+  /* ---------- flat buildings (z13–15) with a light grey outline ---------- */
   L.push({
     id: 'building',
     type: 'fill',
@@ -166,15 +166,19 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     'source-layer': 'building',
     minzoom: 13,
     maxzoom: 15,
-    paint: { 'fill-color': p.building, 'fill-opacity': zl(13, 0, 13.7, 1) },
+    paint: { 'fill-color': p.building, 'fill-opacity': zl(13, 0, 13.6, 1) },
   });
   L.push({
     id: 'building-outline',
     type: 'line',
     ...src,
     'source-layer': 'building',
-    minzoom: 13.5,
-    paint: { 'line-color': p.buildingOutline, 'line-width': zl(13.5, 0.25, 17, 0.9), 'line-opacity': 0.8 },
+    minzoom: 13.2,
+    paint: {
+      'line-color': p.buildingOutline,
+      'line-width': zl(13.2, 0.3, 17, 1),
+      'line-opacity': zl(13.2, 0, 13.8, 0.85),
+    },
   });
 
   /* ---------- rail, paths and roads ---------- */
@@ -244,7 +248,11 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     },
   });
 
-  /* ---------- borders ---------- */
+  /* ---------- borders ----------
+     Country outlines get a dark casing plus a clearly visible grey line so
+     they read at every zoom, including the initial globe view. State lines
+     are thinner and dashed. */
+  const boundaryLayout = { 'line-cap': 'round', 'line-join': 'round' };
   L.push({
     id: 'boundary-state',
     type: 'line',
@@ -252,7 +260,27 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     'source-layer': 'boundary',
     minzoom: 3,
     filter: ['all', ['==', ['get', 'admin_level'], 4], ['!=', ['get', 'maritime'], 1]],
-    paint: { 'line-color': p.boundaryState, 'line-width': ze(3, 0.4, 8, 1), 'line-dasharray': [4, 2] },
+    layout: boundaryLayout,
+    paint: {
+      'line-color': p.boundaryState,
+      'line-width': ze(3, 0.7, 8, 1.3, 12, 1.9),
+      'line-opacity': 0.95,
+      'line-dasharray': [3, 2],
+    },
+  });
+  L.push({
+    id: 'boundary-country-casing',
+    type: 'line',
+    ...src,
+    'source-layer': 'boundary',
+    minzoom: 0,
+    filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+    layout: boundaryLayout,
+    paint: {
+      'line-color': p.roadCasing ?? p.labelHalo,
+      'line-width': ze(0, 1.6, 4, 2.6, 8, 3.6, 12, 4.4),
+      'line-opacity': 0.85,
+    },
   });
   L.push({
     id: 'boundary-country',
@@ -261,7 +289,12 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     'source-layer': 'boundary',
     minzoom: 0,
     filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
-    paint: { 'line-color': p.boundaryCountry, 'line-width': ze(0, 0.6, 4, 1, 8, 1.8) },
+    layout: boundaryLayout,
+    paint: {
+      'line-color': p.boundaryCountry,
+      'line-width': ze(0, 1, 4, 1.6, 8, 2.6, 12, 3.4),
+      'line-opacity': 1,
+    },
   });
 
   if (p.poi) {

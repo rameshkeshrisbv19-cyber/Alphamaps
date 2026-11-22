@@ -1,7 +1,9 @@
 /**
- * Noir theme — the default. Pure black land, near-black water, light-grey roads (#b5b5b5 major /
- * #8a8a8a minor), dark-grey buildings (#2a2a2a) with a faint light outline,
- * silver labels and no coloured land use or POI icons.
+ * Noir theme — the default. Pure black land, near-black water, light-grey roads
+ * (#c4c4c4 major / #9a9a9a minor), clearly visible grey buildings (#6f6f6f)
+ * with a light outline and dark-grey 3D extrusions. Country outlines are
+ * mid-grey and state lines are dashed grey. Silver labels and no coloured
+ * land use or POI icons.
  *
  * "Noir" is deliberately monochrome: black, silver and a single warm route
  * highlight. Buildings extrude in 3D from zoom 15.
@@ -13,24 +15,24 @@ export const NOIR_PALETTE: Palette = {
   id: 'noir',
   name: 'Noir',
   background: '#000000',
-  landcover: '#050505',
-  landuse: '#060606',
-  park: '#0a0a0a',
+  landcover: '#070707',
+  landuse: '#080808',
+  park: '#0b0b0b',
   water: '#05070a',
   waterway: '#05070a',
-  building: '#2a2a2a',
-  buildingOutline: '#4a4a4a',
-  extrusion: '#2a2a2a',
-  extrusionOpacity: 1,
-  roadMajor: '#b5b5b5',
-  roadMinor: '#8a8a8a',
-  roadPath: '#4a4a4a',
+  building: '#6f6f6f',
+  buildingOutline: '#a3a3a3',
+  extrusion: '#666666',
+  extrusionOpacity: 0.97,
+  roadMajor: '#c4c4c4',
+  roadMinor: '#9a9a9a',
+  roadPath: '#5f5f5f',
   roadCasing: null,
-  rail: '#5a5a5a',
-  boundaryCountry: '#3c3c3c',
-  boundaryState: '#262626',
-  label: '#d6d6d6',
-  labelMinor: '#a6a6a6',
+  rail: '#6a6a6a',
+  boundaryCountry: '#8f8f8f',
+  boundaryState: '#5a5a5a',
+  label: '#e0e0e0',
+  labelMinor: '#b0b0b0',
   labelHalo: '#000000',
   roadLabel: '#c4c4c4',
   routeLabel: '#f4c95d',

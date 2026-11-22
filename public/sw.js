@@ -1,7 +1,9 @@
 /*
  * Alpha Maps service worker — offline-first app shell plus a map-tile cache.
  *
- *  - Page navigations and same-origin files: stale-while-revalidate.
+ *  - Page navigations: network-first so a new Vercel deployment is picked up
+ *    immediately, with the cached app shell as the offline fallback.
+ *  - Other same-origin files: stale-while-revalidate.
  *    The app starts instantly from cache and updates in the background.
  *  - Map vector tiles and glyphs (OpenFreeMap / MapTiler, *.pbf): cache-first,
  *    capped at MAX_TILES entries so storage stays bounded.
@@ -10,7 +12,7 @@
  *    rate-limited and the app already caches results in memory.
  */
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL_CACHE = `alpha-map-shell-${VERSION}`;
 const TILE_CACHE = `alpha-map-tiles-${VERSION}`;
 const MAX_TILES = 2000;
@@ -57,9 +59,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
 
-  // 1) The app itself (works offline because index.html is cached).
+  // 1) The app itself: latest deployment first, cached shell when offline.
   if (request.mode === 'navigate') {
-    event.respondWith(staleWhileRevalidate(request, SHELL_CACHE, new URL('./index.html', self.registration.scope).href));
+    event.respondWith(networkFirstNavigation(request, SHELL_CACHE));
     return;
   }
 
@@ -74,6 +76,22 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(url.pathname.endsWith('.pbf') ? cacheFirst(request) : networkFirst(request));
   }
 });
+
+/** Network-first for the app shell, with an offline cache fallback. */
+async function networkFirstNavigation(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const shellUrl = new URL('./index.html', self.registration.scope).href;
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+      cache.put(shellUrl, response.clone());
+    }
+    return response;
+  } catch {
+    return (await cache.match(request)) || (await cache.match(shellUrl)) || offlineResponse();
+  }
+}
 
 /** Returns the cached copy immediately (if any) and refreshes it in the background. */
 async function staleWhileRevalidate(request, cacheName, fallbackUrl) {
@@ -94,7 +112,7 @@ async function cacheFirst(request) {
   const hit = await cache.match(request);
   if (hit) return hit;
   try {
-    const response = await fetch(request);
+    const response = await fetchWithRetry(request, 2);
     if (response.ok) {
       cache.put(request, response.clone());
       trim(cache, MAX_TILES);
@@ -109,12 +127,29 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
   const cache = await caches.open(TILE_CACHE);
   try {
-    const response = await fetch(request);
+    const response = await fetchWithRetry(request, 2);
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
     return (await cache.match(request)) || offlineResponse();
   }
+}
+
+/** A small retry helps tiles arrive on slow or flaky mobile connections. */
+async function fetchWithRetry(request, attempts) {
+  let last;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const response = await fetch(request);
+      if (response.ok || response.status < 500) return response;
+      last = response;
+    } catch (err) {
+      last = err;
+    }
+    if (i < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 250 * (i + 1)));
+  }
+  if (last instanceof Response) return last;
+  throw last;
 }
 
 async function trim(cache, max) {

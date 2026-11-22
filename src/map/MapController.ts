@@ -151,11 +151,13 @@ export class MapController {
       // 2.25× pixel saving) and ask for the fast GPU.
       pixelRatio: Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2),
       canvasContextAttributes: { antialias: false, powerPreference: 'high-performance' },
-      // Do not redraw expired tiles and do not copy the world at low zoom.
-      refreshExpiredTiles: false,
-      renderWorldCopies: false,
-      // Keep a small, bounded tile cache; the service worker handles offline.
-      maxTileCacheSize: 48,
+      // Do not block tiles from refreshing when they expire; correctness wins
+      // over a marginally cheaper session.
+      refreshExpiredTiles: true,
+      // Render the world normally at low zoom so the whole globe is present.
+      renderWorldCopies: true,
+      // Keep enough tiles for a full city/globe view without evicting visible ones.
+      maxTileCacheSize: 200,
       // The style is built locally; skip the expensive style validation pass.
       validateStyle: false,
     });
@@ -164,11 +166,10 @@ export class MapController {
     this.map.on('click', (e) => this.handleClick(e));
     this.map.on('error', (e) => this.handleError(e));
 
-    // Dismiss the splash as soon as the first complete frame exists, not when
-    // every tile has finished loading (that could take several seconds).
-    this.map.on('load', () => this.notifyReady());
+    // Keep the splash until the map has finished its first full idle pass, so
+    // the user never sees a half-loaded map. A long timeout is a safety net.
     this.map.once('idle', () => this.notifyReady());
-    window.setTimeout(() => this.notifyReady(), 2500);
+    window.setTimeout(() => this.notifyReady(), 8000);
   }
 
   /* ============================ style & lifecycle ============================ */

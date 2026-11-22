@@ -16,11 +16,22 @@ window.setTimeout(() => {
   if (!boot) return;
   boot.classList.add('hide');
   window.setTimeout(() => boot.remove(), 500);
-}, 6000);
+}, 12000);
 
 // Offline shell: register the service worker only in production builds
 // (during `vite dev` it would cache stale modules).
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  // If this page is already controlled by an older worker, reload once when a
+  // newly deployed worker takes over so Vercel updates appear immediately.
+  if (navigator.serviceWorker.controller) {
+    let swReloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (swReloaded) return;
+      swReloaded = true;
+      window.location.reload();
+    });
+  }
+
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)

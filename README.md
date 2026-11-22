@@ -15,6 +15,9 @@ A responsive, installable, offline-capable map built with **React + Vite + TypeS
   - Roads are drawn from `transportation_name` with the exact OSM road name.
   - Motorways, trunks and primary routes also show the **public route number** from the OSM `ref` tag (I‑5, US 101, M1, A14 …), in a distinct shield-like colour.
   - Tapping a road shows its exact name and, when signposted, the route number; turn-by-turn steps show both too.
+- **Boundaries and buildings.** Country outlines have a dark casing and a clear mid-grey line at every zoom; state lines are dashed grey. Buildings are visible from zoom 13 in a light grey that stays dimmer than the roads, with a subtle outline and darker 3D extrusions.
+- **Minimisable turn-by-turn.** The corner button in Directions minimises the sheet to a small floating window showing the next manoeuvre, distance to it, travel mode and live GPS speed. Expand it again or close it from the mini window.
+- **Live speed.** The mini directions window shows speed from the device GPS (km/h or mph) alongside Car, Bike or Walk mode.
 - **3D buildings.** Flat buildings from zoom 13, extruded 3D buildings from zoom 15. The **3D** button tilts the camera.
 - **Label language.** Local (native), English, Hindi, Urdu, Arabic, Bengali, Chinese, Japanese, Russian, Spanish, French, German and Portuguese. Labels use the `name:xx` field and fall back to `name`.
 - **My location.** A pulsing blue dot with an accuracy circle, a live position watch, and fly-to on press. Denied or unavailable permission shows a clear message.
@@ -140,7 +143,9 @@ The build produces a single self-contained `dist/index.html` (MapLibre, its work
 
 1. *Add New → Project* and import the repository.
 2. Framework preset **Vite**, build command `npm run build`, output directory `dist`.
-3. Deploy.
+3. Deploy. Each push to the branch redeploys.
+
+The included `vercel.json` already sets the Vite framework, `npm run build` and `dist` output, so a fresh import needs no extra configuration.
 
 ### Installing the app
 

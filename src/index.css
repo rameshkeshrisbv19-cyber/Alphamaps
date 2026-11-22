@@ -358,6 +358,148 @@ select option {
   animation: toast-in 0.25s ease both;
 }
 
+/* Minimised directions window */
+.mini-directions {
+  position: fixed;
+  z-index: 35;
+  left: 12px;
+  bottom: 40px;
+  width: min(380px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: 20px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  animation: sheet-in-up 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.mini-directions-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mini-speed {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  color: var(--ui-fg);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 2px;
+}
+
+.mini-actions button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-btn);
+  color: var(--ui-fg);
+}
+
+.mini-actions button:hover {
+  background: var(--ui-btn-hover);
+}
+
+.mini-directions-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.mini-turn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--ui-accent);
+  color: var(--ui-accent-fg);
+}
+
+.mini-instruction {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.mini-detail {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--ui-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-directions-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--ui-border);
+}
+
+.mini-distance {
+  color: var(--ui-accent);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-gps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ui-muted);
+  font-size: 11px;
+}
+
+.mini-gps-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ui-muted);
+}
+
+.mini-gps-dot.is-live {
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+  animation: loc-pulse 2s ease-out infinite;
+}
+
+@media (max-width: 767px) {
+  .mini-directions {
+    left: 8px;
+    right: 8px;
+    bottom: 36px;
+    width: auto;
+  }
+}
+
 /* Bottom sheet (phones) / floating side panel (desktop) */
 .sheet {
   position: fixed;

@@ -31,6 +31,14 @@ export function formatDistance(metres: number, units: Units): string {
   return `${miles.toFixed(miles < 10 ? 2 : 1)} mi`;
 }
 
+/** Formats GPS speed (metres/second) as km/h or mph. */
+export function formatSpeed(metresPerSecond: number | null | undefined, units: Units): string {
+  if (metresPerSecond === null || metresPerSecond === undefined || !Number.isFinite(metresPerSecond)) return '—';
+  const value = Math.max(0, metresPerSecond) * (units === 'mi' ? 2.236936 : 3.6);
+  const rounded = value < 10 ? value.toFixed(1) : Math.round(value).toString();
+  return `${rounded} ${units === 'mi' ? 'mph' : 'km/h'}`;
+}
+
 /** Formats seconds as "< 1 min", "45 min" or "1 h 20 min". */
 export function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds)) return '—';

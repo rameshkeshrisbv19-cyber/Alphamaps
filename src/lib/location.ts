@@ -3,6 +3,7 @@
  * It keeps a single watch alive and turns browser errors into friendly messages.
  */
 import type { GeoFix, GeoStatus } from '../types';
+import { haversine } from './geo';
 
 export interface GeoErrorInfo {
   status: GeoStatus;
@@ -11,6 +12,7 @@ export interface GeoErrorInfo {
 
 export class LocationWatcher {
   private watchId: number | null = null;
+  private lastFix: { lat: number; lng: number; at: number } | null = null;
 
   get active(): boolean {
     return this.watchId !== null;
@@ -18,6 +20,7 @@ export class LocationWatcher {
 
   start(onFix: (fix: GeoFix) => void, onError: (err: GeoErrorInfo) => void): void {
     if (this.watchId !== null) return; // already watching — keep the existing watch
+    this.lastFix = null;
     if (!window.isSecureContext) {
       onError({ status: 'insecure', message: 'Location needs a secure (HTTPS) connection.' });
       return;
@@ -28,13 +31,33 @@ export class LocationWatcher {
     }
 
     this.watchId = navigator.geolocation.watchPosition(
-      (pos) =>
+      (pos) => {
+        const now = Date.now();
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        let speed = pos.coords.speed;
+
+        // Some browsers never fill in coords.speed. Derive it from the last two
+        // GPS fixes so the speed readout still works while walking or riding.
+        if (speed === null || !Number.isFinite(speed)) {
+          if (this.lastFix) {
+            const dt = (now - this.lastFix.at) / 1000;
+            const moved = haversine(this.lastFix, { lat, lng });
+            speed = dt > 0 ? moved / dt : null;
+          } else {
+            speed = null;
+          }
+        }
+        this.lastFix = { lat, lng, at: now };
+
         onFix({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
+          lat,
+          lng,
           accuracy: pos.coords.accuracy,
           heading: pos.coords.heading,
-        }),
+          speed: speed !== null && Number.isFinite(speed) ? Math.max(0, speed) : null,
+        });
+      },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
           this.stop(); // the browser will not deliver fixes until permission changes
@@ -49,7 +72,7 @@ export class LocationWatcher {
           onError({ status: 'timeout', message: 'Still looking for your position…' });
         }
       },
-      { enableHighAccuracy: true, maximumAge: 4000, timeout: 20000 },
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 },
     );
   }
 

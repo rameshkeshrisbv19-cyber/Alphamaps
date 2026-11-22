@@ -15,6 +15,7 @@ import {
   Crosshair,
   Flag,
   Footprints,
+  Gauge,
   LoaderCircle,
   LocateFixed,
   LogOut,
@@ -27,16 +28,16 @@ import {
   Undo2,
   type LucideIcon,
 } from 'lucide-react';
-import { formatDistance, formatDuration } from '../lib/geo';
-import type { GeoStatus, RouteQuery, RouteResult, RouteStep, StepIcon, TravelMode, Units } from '../types';
+import { formatDistance, formatDuration, formatSpeed } from '../lib/geo';
+import type { GeoFix, GeoStatus, RouteQuery, RouteResult, RouteStep, StepIcon, TravelMode, Units } from '../types';
 
-const MODES: { id: TravelMode; label: string; Icon: LucideIcon }[] = [
+export const MODES: { id: TravelMode; label: string; Icon: LucideIcon }[] = [
   { id: 'car', label: 'Car', Icon: Car },
   { id: 'bike', label: 'Bike', Icon: Bike },
   { id: 'walk', label: 'Walk', Icon: Footprints },
 ];
 
-const STEP_ICONS: Record<StepIcon, LucideIcon> = {
+export const STEP_ICONS: Record<StepIcon, LucideIcon> = {
   straight: ArrowUp,
   'slight-right': ArrowUpRight,
   right: CornerUpRight,
@@ -60,6 +61,7 @@ interface DirectionsPanelProps {
   picking: boolean;
   geoStatus: GeoStatus;
   geoMessage?: string;
+  fix: GeoFix | null;
   onMode: (mode: TravelMode) => void;
   onSelect: (index: number) => void;
   onStep: (step: RouteStep) => void;
@@ -134,6 +136,15 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
             {label}
           </button>
         ))}
+      </div>
+
+      {/* Live GPS speed */}
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed px-3 py-2" style={{ borderColor: 'var(--ui-border)' }}>
+        <span className="flex items-center gap-2 text-sm ui-muted">
+          <Gauge className="h-4 w-4" aria-hidden="true" />
+          Current speed
+        </span>
+        <span className="text-sm font-bold tabular-nums">{formatSpeed(props.fix?.speed, units)}</span>
       </div>
 
       {/* Route alternatives */}

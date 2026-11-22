@@ -23,7 +23,10 @@ export interface TapFeature {
 export interface GeoFix extends LatLng {
   /** Accuracy radius in metres (drawn as the translucent halo). */
   accuracy: number;
+  /** GPS course in degrees, when the device reports it. */
   heading: number | null;
+  /** GPS speed in metres/second, when the device reports it. */
+  speed: number | null;
 }
 
 export type GeoStatus =
