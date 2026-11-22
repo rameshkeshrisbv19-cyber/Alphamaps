@@ -168,7 +168,7 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     maxzoom: 14.5,
     paint: {
       'fill-color': p.building,
-      'fill-opacity': zl(13, 0.2, 13.4, 1),
+      'fill-opacity': zl(13, 0.4, 13.4, 1),
       'fill-antialias': true,
     },
   });
@@ -182,7 +182,7 @@ export function buildLayers(p: Palette, lang: string): Json[] {
     paint: {
       'line-color': p.buildingOutline,
       'line-width': zl(13, 0.4, 17, 1.1),
-      'line-opacity': zl(13, 0.35, 13.4, 0.95),
+      'line-opacity': zl(13, 0.5, 13.4, 0.95),
     },
   });
 
